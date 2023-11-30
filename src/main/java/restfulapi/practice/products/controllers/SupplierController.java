@@ -1,5 +1,6 @@
 package restfulapi.practice.products.controllers;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,9 @@ public class SupplierController {
   @Autowired
   private SupplierService supplierService;
 
+  @Autowired
+  private ModelMapper modelMapper;
+
   @PostMapping
   public ResponseEntity<ResponseDto<Supplier>> createSupplier(@Valid @RequestBody SupplierDto supplierDto, Errors errors) {
 
@@ -39,11 +43,8 @@ public class SupplierController {
       responseData.setPayload(null);
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
     }
-    
-    Supplier supplier = new Supplier();
-    supplier.setName(supplierDto.getName());
-    supplier.setAddress(supplierDto.getAddress());
-    supplier.setEmail(supplierDto.getEmail());
+
+    Supplier supplier = modelMapper.map(supplierDto, Supplier.class);
 
     responseData.setStatus(true);
     responseData.setPayload(supplierService.createSupplier(supplier));
@@ -65,7 +66,7 @@ public class SupplierController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<ResponseDto<Supplier>> updateSupplier(@PathVariable String id, @Valid @RequestBody Supplier supplier, Errors errors) {
+  public ResponseEntity<ResponseDto<Supplier>> updateSupplier(@PathVariable String id, @Valid @RequestBody SupplierDto supplierDto, Errors errors) {
     ResponseDto<Supplier> responseData = new ResponseDto<>();
 
     if (errors.hasErrors()) {
@@ -76,6 +77,9 @@ public class SupplierController {
       responseData.setPayload(null);
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
     }
+
+    Supplier supplier = modelMapper.map(supplierDto, Supplier.class);
+
     responseData.setStatus(true);
     responseData.setPayload(supplierService.createSupplier(supplier));
     return ResponseEntity.ok(responseData);
